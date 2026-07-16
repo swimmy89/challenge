@@ -54,11 +54,10 @@ TimeTreeは新規開発者向けの公式APIキー発行を停止しているた
 3. Project の **Settings → Environment Variables** に以下を追加する
    - `AUTH_SECRET`（`openssl rand -base64 32` などで生成）
    - `APP_USER_EMAIL` / `APP_USER_PASSWORD` / `APP_USER_NAME`（初回シード用）
-4. Deploy を実行する。ビルド時に `prisma generate && prisma migrate deploy && next build` が
-   走り、Postgres にスキーマが自動適用されます
-5. 初回のみ、ローカルから本番 DB に対してシードを実行してユーザーを作成する
-   ```bash
-   POSTGRES_PRISMA_URL=... POSTGRES_URL_NON_POOLING=... \
-   APP_USER_EMAIL=... APP_USER_PASSWORD=... npx prisma db seed
-   ```
-6. 発行された `https://<project-name>.vercel.app` にアクセスしてログインする
+4. Deploy を実行する。ビルド時に `prisma generate && prisma migrate deploy && prisma db seed && next build`
+   が走り、Postgres へのスキーマ適用と、環境変数で指定したユーザーの作成/更新（upsert）が自動で行われます
+5. 発行された `https://<project-name>.vercel.app` にアクセスし、`APP_USER_EMAIL` / `APP_USER_PASSWORD`
+   でログインする
+
+`APP_USER_EMAIL` / `APP_USER_PASSWORD` を Environment Variables で変更してから再デプロイすると、
+その内容でログイン情報が上書きされます（パスワード変更などに利用できます）。

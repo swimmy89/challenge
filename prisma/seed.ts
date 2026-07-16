@@ -6,9 +6,10 @@ async function main() {
   const password = process.env.APP_USER_PASSWORD;
 
   if (!email || !password) {
-    throw new Error(
-      "APP_USER_EMAIL and APP_USER_PASSWORD must be set in .env to seed the initial user"
+    console.log(
+      "Skipping seed: APP_USER_EMAIL and APP_USER_PASSWORD are not set"
     );
+    return;
   }
 
   const passwordHash = await bcrypt.hash(password, 10);
