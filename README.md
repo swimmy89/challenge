@@ -15,7 +15,7 @@ TimeTree と連携した「今日の予定」表示、日々の「やること�
 ```bash
 npm install
 cp .env.example .env
-# .env を編集: POSTGRES_PRISMA_URL, POSTGRES_URL_NON_POOLING, AUTH_SECRET, APP_USER_EMAIL, APP_USER_PASSWORD などを設定
+# .env を編集: POSTGRES_URL, AUTH_SECRET, APP_USER_EMAIL, APP_USER_PASSWORD などを設定
 npx prisma migrate dev
 npx prisma db seed
 npm run dev
@@ -48,9 +48,9 @@ TimeTreeは新規開発者向けの公式APIキー発行を停止しているた
 静的ホスティングでは動作しません。Next.js のサーバー機能に対応した Vercel へのデプロイを想定しています。
 
 1. https://vercel.com で GitHub アカウント連携し、このリポジトリを Import する
-2. Project の **Storage** タブから **Postgres** を追加する（Vercel Postgres を作成し、
-   プロジェクトに接続すると `POSTGRES_PRISMA_URL` / `POSTGRES_URL_NON_POOLING` が自動で
-   環境変数に設定されます）
+2. Project の **Storage** タブから **Prisma Postgres** を追加する（データベースを作成し、
+   プロジェクトに接続すると `DATABASE_URL` / `PRISMA_DATABASE_URL` / `POSTGRES_URL` が自動で
+   環境変数に設定されます。本アプリは Accelerate 拡張を使わず直接接続の `POSTGRES_URL` のみを利用します）
 3. Project の **Settings → Environment Variables** に以下を追加する
    - `AUTH_SECRET`（`openssl rand -base64 32` などで生成）
    - `APP_USER_EMAIL` / `APP_USER_PASSWORD` / `APP_USER_NAME`（初回シード用）
