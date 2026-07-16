@@ -15,13 +15,16 @@ TimeTree と連携した「今日の予定」表示、日々の「やること�
 ```bash
 npm install
 cp .env.example .env
-# .env を編集: AUTH_SECRET, APP_USER_EMAIL, APP_USER_PASSWORD などを設定
+# .env を編集: POSTGRES_PRISMA_URL, POSTGRES_URL_NON_POOLING, AUTH_SECRET, APP_USER_EMAIL, APP_USER_PASSWORD などを設定
 npx prisma migrate dev
 npx prisma db seed
 npm run dev
 ```
 
 http://localhost:3000 を開いてログインしてください。
+
+データベースは PostgreSQL を利用します（ローカル開発では Docker などで用意するか、
+下記の Vercel Postgres をローカルからも参照してください）。
 
 ### TimeTree との連携方法
 
@@ -35,6 +38,27 @@ TimeTreeは新規開発者向けの公式APIキー発行を停止しているた
 ## 技術スタック
 
 - Next.js (App Router) / TypeScript / Tailwind CSS
-- Prisma + SQLite
+- Prisma + PostgreSQL
 - Auth.js (NextAuth v5, Credentials provider)
 - node-ical (TimeTree ICSフィードの取得・解析)
+
+## デプロイ（Vercel）
+
+このアプリはログイン機能・データベース・Server Actions を使うため、GitHub Pages のような
+静的ホスティングでは動作しません。Next.js のサーバー機能に対応した Vercel へのデプロイを想定しています。
+
+1. https://vercel.com で GitHub アカウント連携し、このリポジトリを Import する
+2. Project の **Storage** タブから **Postgres** を追加する（Vercel Postgres を作成し、
+   プロジェクトに接続すると `POSTGRES_PRISMA_URL` / `POSTGRES_URL_NON_POOLING` が自動で
+   環境変数に設定されます）
+3. Project の **Settings → Environment Variables** に以下を追加する
+   - `AUTH_SECRET`（`openssl rand -base64 32` などで生成）
+   - `APP_USER_EMAIL` / `APP_USER_PASSWORD` / `APP_USER_NAME`（初回シード用）
+4. Deploy を実行する。ビルド時に `prisma generate && prisma migrate deploy && next build` が
+   走り、Postgres にスキーマが自動適用されます
+5. 初回のみ、ローカルから本番 DB に対してシードを実行してユーザーを作成する
+   ```bash
+   POSTGRES_PRISMA_URL=... POSTGRES_URL_NON_POOLING=... \
+   APP_USER_EMAIL=... APP_USER_PASSWORD=... npx prisma db seed
+   ```
+6. 発行された `https://<project-name>.vercel.app` にアクセスしてログインする
